@@ -27,11 +27,16 @@ router.post('/auth',(req, res) => {
         }
       })
     .then(users=> {
-        res.send({
-            status:200,
-            data:users[0]
-        })
-        res.end()
+        if(users[0]){
+            res.send({
+                status:200,
+                data:users[0]
+            })
+            res.end()
+        }
+        else{
+            res.sendStatus(400)
+        }
     })
     .catch(err=> console.log(err, ' did not found user res'))
 })
