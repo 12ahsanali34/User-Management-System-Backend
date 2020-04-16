@@ -14,7 +14,7 @@ app.use(bodyParser.json())
 app.get(['/','/update','/get-user'], require('./router/users'))
 app.get(['/contacts', '/contact_delete'], require('./router/contacts'))
 
-app.post(['/add'], require('./router/users'))
+app.post(['/add', '/auth'], require('./router/users'))
 app.post(['/contact_add', '/contact_update'], require('./router/contacts'))
 
 const PORT = process.env.PORT || 8000

@@ -23,7 +23,11 @@ const Users = db.define('users',{
     password: {
         type:Sequelize.INTEGER,
         allowNull: false,
-    }
+    },
+    secret:{
+        type:Sequelize.INTEGER,
+        allowNull: false,
+    },
 },{
     timestamps: false
 })

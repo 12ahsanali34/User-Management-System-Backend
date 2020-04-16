@@ -17,6 +17,25 @@ router.get('/',(req, res) => {
     .catch(err=> console.log(err, ' Error res'))
 })
 
+router.post('/auth',(req, res) => {
+    const { email, password } = req.body
+    UserModel.findAll({
+        attributes: ['id','name','age', 'email',"secret"],
+        where: {
+            email: email,
+            password:password
+        }
+      })
+    .then(users=> {
+        res.send({
+            status:200,
+            data:users[0]
+        })
+        res.end()
+    })
+    .catch(err=> console.log(err, ' did not found user res'))
+})
+
 router.post('/add',(req, res) => {
     const { name, age, email, password } = req.body
     console.log("email", req.body)
@@ -30,11 +49,13 @@ router.post('/add',(req, res) => {
     .then(users=> {
         console.log("users", users.length)
         if(users.length == 0){
+            let secret = Math.random().toString().slice(2,11);
             UserModel.create({
                 name,
                 age,
                 email,
-                password
+                password,
+                secret
             })
             .then(user=> {
                 res.send({
