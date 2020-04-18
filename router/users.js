@@ -43,8 +43,6 @@ router.post('/auth',(req, res) => {
 
 router.post('/add',(req, res) => {
     const { name, age, email, password } = req.body
-    console.log("email", req.body)
-
     UserModel.findAll({
         attributes: ['id','name','age', 'email', "password"],
         where: {
@@ -55,9 +53,10 @@ router.post('/add',(req, res) => {
         console.log("users", users.length)
         if(users.length == 0){
             let secret = Math.random().toString().slice(2,11);
+            let Age = Number(age)
             UserModel.create({
                 name,
-                age,
+                age:Age,
                 email,
                 password,
                 secret

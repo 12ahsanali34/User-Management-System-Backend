@@ -6,13 +6,14 @@ var bodyParser = require('body-parser')
 router.get('/contacts',(req, res) => {
     ContactsModel.findAll(
         {
-            attributes: ['name','number'],
+            attributes: ['name','number','role', 'id', 'age'],
             where: {
                 user_id: req.query.user_id
             }
         }
     )
     .then(users=> {
+        console.log(JSON.stringify(users), ' JSON.stringify(users)')
         res.setHeader('Content-Type', 'application/json');
         res.status(200)
         res.send(JSON.stringify(users))
@@ -22,13 +23,15 @@ router.get('/contacts',(req, res) => {
 })
 
 router.post('/contact_add',(req, res) => {
-    const { name, number, user_id } = req.body
+    const { name, number, user_id, age, role } = req.body
     console.log("contact", req.body)
 
     ContactsModel.create({
         name,
         number,
-        user_id
+        user_id,
+        age,
+        role
     })
     .then(contacts=> {
         res.send({

@@ -19,6 +19,14 @@ const Contacts = db.define('contacts',{
     user_id:{
         type:Sequelize.INTEGER,
         allowNull: false,
+    },
+    role:{
+        type:Sequelize.INTEGER,
+        allowNull: true,
+    },
+    age:{
+        type:Sequelize.INTEGER,
+        allowNull: true,
     }
 },{
     timestamps: false
