@@ -1,20 +1,24 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../config/database');
 const UserModel = require('../models/users');
-const ContactsModel = require('../models/contacts');
-var bodyParser = require('body-parser')
-var jsonParser = bodyParser.json();
+var jwt = require('jsonwebtoken')
 
 router.get('/',(req, res) => {
-    UserModel.findAll()
-    .then(users=> {
-        res.setHeader('Content-Type', 'application/json');
-        res.status(200)
-        res.send(JSON.stringify(users))
-        res.end()
+    jwt.verify(req.token, 'secretkey', (err, authData)=>{
+        if(err){
+            res.sendStatus(403)
+        }
+        else{
+            UserModel.findAll()
+            .then(users=> {
+                res.setHeader('Content-Type', 'application/json');
+                res.status(200)
+                res.send(JSON.stringify(users))
+                res.end()
+            })
+            .catch(err=> console.log(err, ' Error res'))
+        }
     })
-    .catch(err=> console.log(err, ' Error res'))
 })
 
 router.post('/auth',(req, res) => {
@@ -28,11 +32,14 @@ router.post('/auth',(req, res) => {
       })
     .then(users=> {
         if(users[0]){
-            res.send({
-                status:200,
-                data:users[0]
+            jwt.sign({user:users[0]}, 'secretkey', (err, token)=>{
+                res.send({
+                    data:users[0],
+                    token
+                })
+                res.end()
+
             })
-            res.end()
         }
         else{
             res.sendStatus(400)
@@ -82,35 +89,49 @@ router.post('/add',(req, res) => {
 })
 
 router.get('/update',(req, res) => {
-    UserModel.update( 
-        { name: req.query.name, address: req.query.address},
-        { 
-            where: { id: req.query.id }
+    jwt.verify(req.token, 'secretkey', (err, authData)=>{
+        if(err){
+            res.sendStatus(403)
         }
-    )
-    .then(users=> {
-        res.send({
-            status:200,
-            message:'user updated.'
-        })
-        res.end()
+        else{
+            UserModel.update( 
+                { name: req.query.name, address: req.query.address},
+                { 
+                    where: { id: req.query.id }
+                }
+            )
+            .then(users=> {
+                res.send({
+                    status:200,
+                    message:'user updated.'
+                })
+                res.end()
+            })
+            .catch(err=> console.log(err, ' Error res'))
+        }
     })
-    .catch(err=> console.log(err, ' Error res'))
 })
 
 router.get('/get-user',(req, res) => {
-    UserModel.findAll({
-        attributes: ['name','address'],
-        where: {
-          id: req.query.id
+    jwt.verify(req.token, 'secretkey', (err, authData)=>{
+        if(err){
+            res.sendStatus(403)
         }
-      })
-    .then(users=> {
-        let user = JSON.stringify(users)
-        res.send(JSON.parse(user)[0])
-        res.end()
+        else{
+            UserModel.findAll({
+                attributes: ['name','address'],
+                where: {
+                  id: req.query.id
+                }
+              })
+            .then(users=> {
+                let user = JSON.stringify(users)
+                res.send(JSON.parse(user)[0])
+                res.end()
+            })
+            .catch(err=> console.log(err, ' Error res'))
+        }
     })
-    .catch(err=> console.log(err, ' Error res'))
 })
 
 module.exports = router;

@@ -1,6 +1,5 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const path = require('path');
 const db = require('./config/database');
 
 db.authenticate()
@@ -10,18 +9,31 @@ db.authenticate()
 var allowCrossDomain = function(req, res, next) {
     res.header('Access-Control-Allow-Origin', "*");
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-    res.header('Access-Control-Allow-Headers', 'Content-Type');
+    res.header('Access-Control-Allow-Headers', "Origin, X-Requested-With, Content-Type, Accept, Authorization");
     next();
 }
 const app = express();
 app.use(allowCrossDomain);
 app.use(bodyParser.json())
 
-app.get(['/','/update','/get-user'], require('./router/users'))
-app.get(['/contacts', '/contact_delete'], require('./router/contacts'))
+function varifyToken(req, res, next){
+    const bearerHeader = req.headers['authorization'];
+    if(typeof bearerHeader !== 'undefined'){
+        const bearer = bearerHeader.split(' ');
+        const bearerToken = bearer[1]
+        req.token = bearerToken
+    }
+    else{
+        res.sendStatus(403)
+    }
+    next();
+}
+
+app.get(['/','/update','/get-user'], varifyToken ,require('./router/users'))
+app.get(['/contacts', '/contact_delete'], varifyToken ,require('./router/contacts'))
 
 app.post(['/add', '/auth'], require('./router/users'))
-app.post(['/contact_add', '/contact_update'], require('./router/contacts'))
+app.post(['/contact_add', '/contact_update'], varifyToken ,require('./router/contacts'))
 
 const PORT = process.env.PORT || 8000
 
