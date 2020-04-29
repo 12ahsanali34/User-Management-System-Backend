@@ -9,7 +9,7 @@ const Contacts = db.define('contacts',{
         autoIncrement: true
     },
     name:{
-        type:Sequelize.INTEGER,
+        type:Sequelize.BIGINT,
         allowNull: false,
     },
     number:{
